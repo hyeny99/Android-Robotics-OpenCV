@@ -35,6 +35,9 @@ public class MBot  implements Runnable
     //*********************************************************************************************
     private static final String TAG = "MBot";
 
+    //adapt a singleton method: creates a single instance of mbot
+    private static MBot _instance;
+
     private BluetoothGatt    bluetoothGatt;
 
     private final BlockingQueue<byte[]> queue;
@@ -52,7 +55,7 @@ public class MBot  implements Runnable
     /**
      * Constructor
      */
-    public MBot()
+    private MBot()
     {
         queue = new ArrayBlockingQueue<byte[]>( 100);
 
@@ -62,6 +65,13 @@ public class MBot  implements Runnable
             mainThread.start();
             mainThread.setPriority( NORM_PRIORITY );
         }
+    }
+
+    public static MBot getInstance(){
+        if (_instance == null){
+            _instance = new MBot();
+        }
+        return _instance;
     }
 
     //---------------------------------------------------------------------------------------------

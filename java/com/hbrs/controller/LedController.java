@@ -7,6 +7,12 @@ public class LedController {
     private MBot mbot;
     private int ledId;
 
+    enum Command{
+        LEFT,RIGHT,FORWARD,BACKWARD
+    }
+
+    private Command prevCommand = null;
+
     public LedController(MBot mbot){
         this.mbot = mbot;
         this.ledId = 12; // by default
@@ -36,41 +42,66 @@ public class LedController {
     }
 
     public void turnLeftLEDon(){
-        turnLEDoff();
-        //3,2,1,12,11,10,9
-        // 8 -> 9
-        // 9 -> 10
-        // 10 -> 11
-        // 11 -> 12
-        // 12-> 1
-        // 1 -> 2
-        // 2 -> 3
-        ledId = 8;
-        for(int i = 0; i < 7; i++){
-            ledId = (ledId % 12) + 1;
-            this.mbot.setLight(ledId, 0, 0, 20);
+        if(prevCommand != Command.LEFT) {
+
+            turnLEDoff();
+            ledId = 8;
+            for (int i = 0; i < 7; i++) {
+                ledId = (ledId % 12) + 1;
+                this.mbot.setLight(ledId, 0, 0, 20);
+            }
+            prevCommand = Command.LEFT;
+
         }
     }
 
     public void turnRightLEDon(){
-        //3, 4, 5, 6, 7, 8, 9
-        turnLEDoff();
-        for(ledId = 3; ledId < 10; ledId++){
-            this.mbot.setLight(ledId,0, 0, 20);
+        if(prevCommand != Command.RIGHT) {
+
+            turnLEDoff();
+            for (ledId = 3; ledId < 10; ledId++) {
+                this.mbot.setLight(ledId, 0, 0, 20);
+            }
+            prevCommand = Command.RIGHT;
+
         }
     }
 
     public void forwardLEDon(){
-        turnLEDoff();
-        for(ledId = 1; ledId < 7; ledId++)
-            this.mbot.setLight(ledId, 0, 0, 20);
+        if(prevCommand != Command.FORWARD) {
+
+            turnLEDoff();
+            for (ledId = 1; ledId < 7; ledId++) {
+                this.mbot.setLight(ledId, 0, 0, 20);
+            }
+            prevCommand = Command.FORWARD;
+
+        }
     }
 
     public void backwardLEDon(){
-        turnLEDoff();
-        for(ledId = 6; ledId < 13; ledId++)
-            this.mbot.setLight(ledId, 0, 0, 20);
+        if(prevCommand != Command.BACKWARD) {
 
+            turnLEDoff();
+            for (ledId = 6; ledId < 13; ledId++) {
+                this.mbot.setLight(ledId, 0, 0, 20);
+            }
+            prevCommand = Command.BACKWARD;
+
+        }
+    }
+
+    public void joystickLED(double degrees){
+        int index = (int)Math.round(degrees/30.0)+2;
+        index = (index%12)+1;
+        if(index != ledId) {
+            turnLEDoff();
+            ledId = index;
+           this.mbot.setLight(ledId,0,0,20);
+        }
+        if(prevCommand != null){
+            prevCommand = null;
+        }
     }
 
     public void turnLEDoff(){

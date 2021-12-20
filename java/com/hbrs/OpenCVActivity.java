@@ -84,16 +84,10 @@ public class OpenCVActivity extends AppCompatActivity
 
         //onBtnConnect(null);
         OpenCVLoader.initDebug();
+        mbot = MBot.getInstance();
 
-        Intent intent = getIntent();
-        address = intent.getStringExtra("passed data");
-
-        mbot = new MBot();
-        if (address != null)
-        {
-            mbot.connect( this, address );
-        }
         directionController = new DirectionController(mbot);
+        directionController.setPower_default(100);
         ledController = new LedController(mbot);
 
     }
@@ -116,6 +110,7 @@ public class OpenCVActivity extends AppCompatActivity
     public void onImgViewPrevious(View view){
         directionController.stop();
         Intent intent = new Intent(this, com.hbrs.MainActivity.class);
+        intent.putExtra("passed data", address);
         startActivityForResult(intent, 123);
     }
 

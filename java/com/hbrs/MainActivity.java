@@ -87,9 +87,15 @@ public class MainActivity extends AppCompatActivity
         joyStick_btn = findViewById(R.id.button_joystick);
         joyStick_btn.setOnTouchListener(new myOnTouchListener());
 
-        mbot = new MBot();
+        Intent intent = getIntent();
+        address = intent.getStringExtra("passed data");
+        mbot = MBot.getInstance();
+        mbot.setDrive(0,0);
+
         directionController = new DirectionController(mbot);
+        directionController.setPower_default(200);
         ledController = new LedController(mbot);
+        ledController.turnLEDoff();
     }
 
     //-----------------------------------------------------------------
@@ -100,16 +106,6 @@ public class MainActivity extends AppCompatActivity
         // make a separate function(joy stick method)
         @Override
         public boolean onTouch(View v, MotionEvent e) {
-            float x = e.getX() / v.getMeasuredWidth();
-            float y = e.getY() / v.getMeasuredHeight();
-            y = (y - (float)0.5);
-            x = (x - (float)0.5);
-
-            float left = y * 300;
-            float right = y * 300;
-            left = left + x * (-100);
-            right = right + x * (100);
-            right = right * (-1);
 
             switch(e.getAction())
             {
@@ -118,12 +114,13 @@ public class MainActivity extends AppCompatActivity
                     break;
                 case MotionEvent.ACTION_MOVE:
 
-                    directionController.moveWhereEver((int)left,(int)right);
-                    //mbot.setDrive((int)left,(int)right);
+                    int[] data = directionController.joystick(e.getX(),e.getY(), v.getMeasuredWidth(), v.getMeasuredHeight());
+                    changeText(data[0], data[1]);
+                    ledController.joystickLED((double)data[2]);
                     break;
                 case MotionEvent.ACTION_UP:
-
                     directionController.stop();
+                    ledController.turnLEDoff();
                     break;
             }
 
@@ -201,9 +198,9 @@ public class MainActivity extends AppCompatActivity
 
     public void onBtnRight(View view)
     {
-        ledController.turnRightLEDon();
         int[] speeds = directionController.moveRight();
         changeText(speeds[0], speeds[1]);
+        ledController.turnRightLEDon();
     }
 
     public void onBtnLeft(View view)
